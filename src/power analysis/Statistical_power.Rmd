@@ -1,0 +1,146 @@
+---
+title: "Statistical power"
+output: 
+  html_document: 
+    toc: yes
+    number_sections: yes
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Preparations
+
+## Packages
+
+```{r message=FALSE, warning=FALSE}
+library(rio)
+library(lme4)
+library(lmerTest)
+library(psych)
+source("../custom functions/custom_functions.R")
+
+```
+
+# Simulation for the entire profile
+
+## Sample size
+
+```{r}
+
+#leave Danish sample out because not included in the moderation analysis
+n<-1104
+
+```
+
+## Test the function in a single run
+
+```{r message=FALSE, warning=FALSE}
+prof_mod_power(n=n,
+               n.item=60,
+               CL.cor=.10,
+               mean.Dist=.30,
+               sd.Dist=.15,
+               wi.rand = F,
+               sd.Dist.wi=.00001)
+```
+
+## Run simulation
+
+```{r message=FALSE}
+#number of repeated processes
+REPS=1000
+#seed for reproducibility
+set.seed(93543)
+
+res.list.10<-list()
+res.list.20<-list()
+res.list.30<-list()
+
+start.time <- Sys.time()
+
+for (i in 1:REPS){
+  res.list.10[[i]]<-
+    prof_mod_power(n=n,
+               n.item=60,
+               CL.cor=.10,
+               mean.Dist=.30,
+               sd.Dist=.15,
+               wi.rand = F,
+               sd.Dist.wi=.00001)
+  
+  res.list.20[[i]]<-
+    prof_mod_power(n=n,
+               n.item=60,
+               CL.cor=.20,
+               mean.Dist=.30,
+               sd.Dist=.15,
+               wi.rand = F,
+               sd.Dist.wi=.00001)
+  
+  res.list.30[[i]]<-
+    prof_mod_power(n=n,
+               n.item=60,
+               CL.cor=.30,
+               mean.Dist=.30,
+               sd.Dist=.15,
+               wi.rand = F,
+               sd.Dist.wi=.00001)
+}
+
+end.time <- Sys.time()
+time.taken <- end.time - start.time
+#how long it took
+time.taken
+
+res.dat.10<-do.call(rbind.data.frame,res.list.10)
+res.dat.20<-do.call(rbind.data.frame,res.list.20)
+res.dat.30<-do.call(rbind.data.frame,res.list.30)
+export(res.dat.10,"power_simuation_results.10.xlsx")
+export(res.dat.20,"power_simuation_results.20.xlsx")
+export(res.dat.30,"power_simuation_results.30.xlsx")
+```
+
+## Analyze the results
+
+### Power
+
+```{r}
+#with population effect r =.10
+table(res.dat.10$Est>0 & res.dat.10$p<.05)/nrow(res.dat.10)
+
+#with population effect r =.20
+table(res.dat.20$Est>0 & res.dat.20$p<.05)/nrow(res.dat.20)
+
+#with population effect r =.30
+table(res.dat.30$Est>0 & res.dat.30$p<.05)/nrow(res.dat.30)
+
+```
+
+### Effect sizes
+
+```{r}
+#with population effect size r = .10
+describe(res.dat.10,fast=T)
+
+#with population effect size r = .20
+describe(res.dat.20,fast=T)
+
+#with population effect size r = .30
+describe(res.dat.30,fast=T)
+```
+
+
+# Custom functions
+
+```{r, code=readLines("../custom functions/custom_functions.R")}
+```
+
+# Session information
+
+```{r}
+s<-sessionInfo()
+print(s,locale=F)
+```

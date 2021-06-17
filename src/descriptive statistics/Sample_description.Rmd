@@ -1,0 +1,151 @@
+---
+title: "Sample description"
+output: 
+  html_document: 
+    toc: yes
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Preparations
+
+## Packages
+
+```{r}
+library(rio)
+library(psych)
+library(dplyr)
+```
+
+## Data
+
+```{r}
+Dan<-import("Dan_fdat.xlsx")
+Brit<-import("Brit_fdat.xlsx")
+Chi2<-import("Chi2_fdat.xlsx")
+CH3<-import("CH3_fdat.xlsx")
+combcouple<-import("combcouple_fdat.xlsx")
+```
+
+### Save total number of observations
+
+```{r}
+Dan.obs<-nrow(Dan)
+Brit.obs<-nrow(Brit)
+Chi2.obs<-nrow(Chi2)
+CH3.obs<-nrow(CH3)
+combcouple.obs<-nrow(combcouple)
+```
+
+### Convert to subject-level data-files
+
+```{r}
+
+Dan.s<-Dan %>%
+  group_by(ID) %>%
+  sample_n(size=1)
+
+Brit.s<-Brit %>%
+  group_by(ID) %>%
+  sample_n(size=1)
+
+Chi2.s<-Chi2 %>%
+  group_by(ID) %>%
+  sample_n(size=1)
+
+CH3.s<-CH3 %>%
+  group_by(ID) %>%
+  sample_n(size=1)
+
+combcouple.s<-combcouple %>%
+  group_by(ID) %>%
+  sample_n(size=1)
+```
+
+### Save sample sizes
+
+```{r}
+Dan.n<-nrow(Dan.s)
+Brit.n<-nrow(Brit.s)
+Chi2.n<-nrow(Chi2.s)
+CH3.n<-nrow(CH3.s)
+combcouple.n<-nrow(combcouple.s)
+```
+
+# Descriptives
+
+## Danish
+
+```{r}
+Dan.n
+table(Dan.s$sex,useNA="always")/nrow(Dan.s)
+describe(Dan.s$age,fast=T)
+table(Dan.s$age)
+table(Dan.s$age<18)
+table(Dan.s$age<10)
+#there is something wrong with the age variable, only code those >  17
+describe(Dan.s$age[Dan.s$age>17],fast=T)
+
+table(Dan.s$rela_status)
+```
+
+## British
+
+```{r}
+Brit.n
+table(Brit.s$sex,useNA="always")/nrow(Brit.s)
+describe(Brit.s$age,fast=T)
+
+round(100*table(Brit.s$rela_status,useNA="always")/nrow(Brit.s),1)
+
+describe(Brit.s$length,fast=T)
+```
+## Chinese 1
+
+```{r}
+Chi2.n
+table(Chi2.s$sex,useNA="always")/nrow(Chi2.s)
+describe(Chi2.s$age,fast=T)
+
+round(100*table(Chi2.s$relation_type,useNA="always")/nrow(Chi2.s),1)
+
+describe(Chi2.s$length,fast=T)
+```
+
+## Chinese 2
+
+```{r}
+CH3.n
+table(CH3.s$sex,useNA="always")/nrow(CH3.s)
+describe(CH3.s$age,fast=T)
+
+round(100*table(CH3.s$relation_type,
+                useNA="always")/nrow(CH3.s),1)
+
+describe(CH3.s$length,fast=T)
+```
+
+
+## Chinese couple sample
+
+```{r}
+combcouple.n
+table(combcouple.s$sex,useNA="always")/nrow(combcouple.s)
+describe(combcouple.s$age,fast=T)
+names(combcouple.s)
+#round(100*table(combcouple.s$relation_type,
+#                useNA="always")/nrow(combcouple.s),1)
+
+describe(combcouple.s$length,fast=T)
+```
+
+# Scale reliability
+
+## Danish
+
+```{r}
+dir()
+```
